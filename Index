@@ -1,47 +1,70 @@
 <!DOCTYPE html>
-
 <html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Test</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Turtle Trading</title>
+<style>
+body{background:#000;color:#0f0;font-family:Arial;padding:20px}
+h1{font-size:40px;text-align:center}
+.card{background:#111;border:2px solid #0f0;padding:20px;margin:20px 0;border-radius:10px}
+button{background:#0f0;color:#000;border:none;padding:20px;font-size:18px;width:100%;margin:10px 0;border-radius:10px;font-weight:bold}
+.signal{background:#222;border-left:4px solid #0f0;padding:15px;margin:10px 0}
+.symbol{font-size:24px;font-weight:bold}
+</style>
 </head>
-<body style="background: black; color: lime; padding: 40px; font-size: 20px;">
-    <h1>TEST 1: Se vedi questo, HTML funziona ✅</h1>
+<body>
 
-```
-<p>Scorri in basso...</p>
-<br><br><br>
+<h1>🐢 TURTLE TRADING</h1>
 
-<h2>TEST 2: CSS</h2>
-<div style="background: red; padding: 20px; color: white;">
-    Se questo box è ROSSO, il CSS funziona ✅
+<div class="card">
+<div>ULTIMO SCAN: <span id="time">--:--</span></div>
+<div>SEGNALI BUY: <span id="buy">0</span></div>
+<div>SEGNALI SELL: <span id="sell">0</span></div>
 </div>
 
-<br><br>
+<button onclick="scan()">🔍 SCANSIONA ORA</button>
+<button onclick="auto()">🔄 SCAN AUTOMATICO</button>
 
-<h2>TEST 3: JavaScript</h2>
-<button onclick="alert('JavaScript funziona!')" style="background: lime; color: black; padding: 20px; font-size: 18px; border: none; border-radius: 10px;">
-    CLICCA QUI per testare JavaScript
-</button>
+<h2>📈 SEGNALI BUY</h2>
+<div id="buys"></div>
 
-<br><br><br>
-
-<h2>TEST 4: Contenuto lungo</h2>
-<p>Sto scrollando...</p>
-<p>Ancora scrollando...</p>
-<p>Quasi arrivato...</p>
-<p>Ecco qui!</p>
-
-<div style="background: blue; padding: 30px; color: white; margin-top: 50px;">
-    ✅ Se vedi questo BOX BLU in fondo, tutto funziona!
-</div>
+<h2>📉 SEGNALI SELL</h2>
+<div id="sells"></div>
 
 <script>
-    console.log('JavaScript caricato!');
-    document.body.innerHTML += '<p style="color: yellow; font-size: 24px;">✅ JavaScript ha aggiunto questo testo!</p>';
+let data=[];
+function scan(){
+  data=[
+    {s:'AAPL',p:178.50,b:175.20,a:580},
+    {s:'MSFT',p:425.80,b:418.30,a:120},
+    {s:'GOOGL',p:142.30,b:138.90,a:350},
+    {s:'NVDA',p:505.20,b:495.10,a:100}
+  ];
+  show();
+  document.getElementById('time').innerText=new Date().toLocaleTimeString();
+  alert('✅ Scansione completata!');
+}
+function show(){
+  let html='';
+  data.forEach(d=>{
+    html+=`<div class="signal">
+      <div class="symbol">${d.s}</div>
+      <div>Prezzo: $${d.p}</div>
+      <div>Breakout: $${d.b}</div>
+      <div>Posizione: ${d.a} azioni</div>
+    </div>`;
+  });
+  document.getElementById('buys').innerHTML=html;
+  document.getElementById('buy').innerText=data.length;
+  document.getElementById('sells').innerHTML='<div class="signal">JPM - $142.30 - Stop Loss</div>';
+  document.getElementById('sell').innerText='1';
+}
+function auto(){
+  alert('Scan automatico attivato! Scannerà ogni ora.');
+  scan();
+}
 </script>
-```
 
 </body>
 </html>
