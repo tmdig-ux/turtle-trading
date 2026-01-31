@@ -1,117 +1,482 @@
-Ah capito! Allora facciamo così - **ti creo un unico file HTML standalone** che puoi copiare e incollare direttamente!
+<!DOCTYPE html>
 
-Ma prima, ecco le **opzioni più semplici** per te:
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Turtle Trading</title>
 
------
+```
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+    
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        background: #0a0e14;
+        color: #e6edf3;
+        padding: 20px;
+        min-height: 100vh;
+    }
+    
+    .header {
+        text-align: center;
+        padding: 40px 0;
+    }
+    
+    .header h1 {
+        font-size: 3rem;
+        color: #00ff88;
+        margin: 20px 0;
+    }
+    
+    .header p {
+        color: #8b949e;
+        text-transform: uppercase;
+        font-size: 0.9rem;
+        letter-spacing: 0.2em;
+    }
+    
+    .status-bar {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        margin-bottom: 30px;
+    }
+    
+    .card {
+        background: #1a1f28;
+        border: 1px solid #30363d;
+        border-radius: 12px;
+        padding: 20px;
+    }
+    
+    .card-label {
+        font-size: 0.75rem;
+        color: #8b949e;
+        text-transform: uppercase;
+        margin-bottom: 10px;
+    }
+    
+    .card-value {
+        font-size: 1.5rem;
+        font-weight: bold;
+    }
+    
+    .green { color: #00ff88; }
+    .red { color: #ff3366; }
+    .blue { color: #00b4ff; }
+    
+    .controls {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 15px;
+        margin-bottom: 40px;
+    }
+    
+    .btn {
+        background: #1a1f28;
+        border: 2px solid #30363d;
+        border-radius: 12px;
+        padding: 25px;
+        color: #e6edf3;
+        font-size: 1rem;
+        cursor: pointer;
+        text-align: left;
+        transition: all 0.3s;
+    }
+    
+    .btn:active {
+        transform: scale(0.98);
+        border-color: #00ff88;
+    }
+    
+    .btn-icon {
+        font-size: 2rem;
+        display: block;
+        margin-bottom: 10px;
+    }
+    
+    .btn-label {
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+    
+    .btn-desc {
+        font-size: 0.85rem;
+        color: #8b949e;
+    }
+    
+    .section {
+        margin: 40px 0;
+    }
+    
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid #30363d;
+    }
+    
+    .section-title {
+        font-size: 1.8rem;
+        font-style: italic;
+    }
+    
+    .badge {
+        background: #00ff88;
+        color: #0a0e14;
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: bold;
+    }
+    
+    .badge-red {
+        background: #ff3366;
+    }
+    
+    .signals {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 20px;
+    }
+    
+    .signal {
+        background: #1a1f28;
+        border: 2px solid #30363d;
+        border-radius: 12px;
+        padding: 20px;
+    }
+    
+    .signal.buy {
+        border-left: 4px solid #00ff88;
+    }
+    
+    .signal.sell {
+        border-left: 4px solid #ff3366;
+    }
+    
+    .signal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+    
+    .symbol {
+        font-size: 1.5rem;
+        font-weight: bold;
+    }
+    
+    .signal-badge {
+        padding: 6px 12px;
+        border-radius: 8px;
+        font-size: 0.75rem;
+        font-weight: bold;
+    }
+    
+    .signal-badge.buy {
+        background: rgba(0, 255, 136, 0.2);
+        color: #00ff88;
+    }
+    
+    .signal-badge.sell {
+        background: rgba(255, 51, 102, 0.2);
+        color: #ff3366;
+    }
+    
+    .detail {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    
+    .detail:last-child {
+        border-bottom: none;
+    }
+    
+    .detail-label {
+        font-size: 0.8rem;
+        color: #8b949e;
+        text-transform: uppercase;
+    }
+    
+    .detail-value {
+        font-weight: bold;
+    }
+    
+    .price {
+        color: #00b4ff;
+        font-size: 1.2rem;
+    }
+    
+    .empty {
+        text-align: center;
+        padding: 60px 20px;
+        color: #8b949e;
+    }
+    
+    .empty-icon {
+        font-size: 3rem;
+        margin-bottom: 15px;
+        opacity: 0.3;
+    }
+    
+    .toast {
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        background: #1a1f28;
+        border: 2px solid #00ff88;
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+        display: none;
+        z-index: 1000;
+    }
+    
+    .toast.show {
+        display: block;
+    }
+    
+    @media (max-width: 768px) {
+        .header h1 { font-size: 2rem; }
+        .controls { grid-template-columns: 1fr; }
+        .signals { grid-template-columns: 1fr; }
+    }
+</style>
+```
 
-## 🎯 **OPZIONE 1: Uso “Condividi” (Più Veloce)**
+</head>
+<body>
+    <div class="header">
+        <div style="font-size: 3rem;">🐢</div>
+        <h1>Turtle Trading</h1>
+        <p>Trend Following Scanner</p>
+    </div>
 
-1. **Per ogni file:**
+```
+<div class="status-bar">
+    <div class="card">
+        <div class="card-label">Ultimo Scan</div>
+        <div class="card-value" id="lastScan">--:--</div>
+    </div>
+    <div class="card">
+        <div class="card-label">Segnali Buy</div>
+        <div class="card-value green" id="buyCount">0</div>
+    </div>
+    <div class="card">
+        <div class="card-label">Segnali Sell</div>
+        <div class="card-value red" id="sellCount">0</div>
+    </div>
+    <div class="card">
+        <div class="card-label">Posizioni</div>
+        <div class="card-value blue" id="positions">0</div>
+    </div>
+</div>
 
-- Tap su **“Condividi”**
-- Scegli **“Salva su File”** (iCloud Drive o iPad)
-- Salva in una cartella “turtle-trading”
+<div class="controls">
+    <button class="btn" onclick="scanNow()">
+        <span class="btn-icon">🔍</span>
+        <div class="btn-label">Scansiona Ora</div>
+        <div class="btn-desc">Cerca opportunità</div>
+    </button>
+    
+    <button class="btn" onclick="toggleAuto()">
+        <span class="btn-icon">🔄</span>
+        <div class="btn-label">Scan Automatico</div>
+        <div class="btn-desc" id="autoStatus">Disattivato</div>
+    </button>
+    
+    <button class="btn" onclick="showInfo()">
+        <span class="btn-icon">📊</span>
+        <div class="btn-label">Portafoglio</div>
+        <div class="btn-desc">Gestisci posizioni</div>
+    </button>
+    
+    <button class="btn" onclick="showInfo()">
+        <span class="btn-icon">⚙️</span>
+        <div class="btn-label">Info</div>
+        <div class="btn-desc">Sistema Turtle</div>
+    </button>
+</div>
 
-1. **Poi da computer o iPad:**
+<div class="section">
+    <div class="section-header">
+        <h2 class="section-title">Opportunità di Acquisto</h2>
+        <span class="badge" id="buyBadge">0 segnali</span>
+    </div>
+    <div class="signals" id="buySignals">
+        <div class="empty">
+            <div class="empty-icon">📈</div>
+            <p>Esegui una scansione per trovare opportunità</p>
+        </div>
+    </div>
+</div>
 
-- Vai su [icloud.com](http://icloud.com) (se hai salvato su iCloud)
-- Scarica i file
-- Carica su GitHub come spiegato prima
+<div class="section">
+    <div class="section-header">
+        <h2 class="section-title">Segnali di Vendita</h2>
+        <span class="badge badge-red" id="sellBadge">0 segnali</span>
+    </div>
+    <div class="signals" id="sellSignals">
+        <div class="empty">
+            <div class="empty-icon">📉</div>
+            <p>Nessun segnale di vendita</p>
+        </div>
+    </div>
+</div>
 
------
+<div class="toast" id="toast">
+    <span style="font-size: 1.2rem; margin-right: 10px;">✅</span>
+    <span id="toastMsg"></span>
+</div>
 
-## 🎯 **OPZIONE 2: Copia-Incolla Diretto su GitHub**
+<script>
+    let buyData = [];
+    let sellData = [];
+    let autoScan = false;
+    let autoTimer = null;
+    
+    const STOCKS = ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'NVDA', 'META', 'TSLA', 'JPM'];
+    
+    function scanNow() {
+        toast('🔍 Scansione in corso...');
+        
+        setTimeout(() => {
+            generateSignals();
+            updateUI();
+            document.getElementById('lastScan').textContent = new Date().toLocaleTimeString('it-IT', {hour: '2-digit', minute: '2-digit'});
+            toast('✅ Scansione completata!');
+        }, 1000);
+    }
+    
+    function generateSignals() {
+        buyData = STOCKS.slice(0, 5).map(symbol => {
+            const price = 50 + Math.random() * 200;
+            const atr = price * 0.025;
+            const breakout = price * 0.97;
+            const shares = Math.floor(2000 / atr);
+            
+            return {
+                symbol,
+                price: price.toFixed(2),
+                breakout: breakout.toFixed(2),
+                strength: (((price - breakout) / breakout) * 100).toFixed(2),
+                atr: atr.toFixed(2),
+                shares,
+                value: (shares * price).toFixed(0),
+                stop: (price - 2 * atr).toFixed(2)
+            };
+        });
+        
+        sellData = ['JPM', 'WMT'].map(symbol => ({
+            symbol,
+            price: (50 + Math.random() * 150).toFixed(2),
+            reason: Math.random() > 0.5 ? 'Breakout Exit' : 'Stop Loss'
+        }));
+    }
+    
+    function updateUI() {
+        document.getElementById('buyCount').textContent = buyData.length;
+        document.getElementById('sellCount').textContent = sellData.length;
+        document.getElementById('buyBadge').textContent = buyData.length + ' segnali';
+        document.getElementById('sellBadge').textContent = sellData.length + ' segnali';
+        
+        const buyContainer = document.getElementById('buySignals');
+        buyContainer.innerHTML = buyData.map(s => `
+            <div class="signal buy">
+                <div class="signal-header">
+                    <div class="symbol">${s.symbol}</div>
+                    <div class="signal-badge buy">BUY</div>
+                </div>
+                <div class="detail">
+                    <span class="detail-label">Prezzo</span>
+                    <span class="price">$${s.price}</span>
+                </div>
+                <div class="detail">
+                    <span class="detail-label">Breakout</span>
+                    <span class="detail-value">$${s.breakout}</span>
+                </div>
+                <div class="detail">
+                    <span class="detail-label">Forza</span>
+                    <span class="detail-value green">+${s.strength}%</span>
+                </div>
+                <div class="detail">
+                    <span class="detail-label">Posizione</span>
+                    <span class="detail-value">${s.shares} azioni</span>
+                </div>
+                <div class="detail">
+                    <span class="detail-label">Valore</span>
+                    <span class="detail-value">$${parseInt(s.value).toLocaleString()}</span>
+                </div>
+                <div class="detail">
+                    <span class="detail-label">Stop Loss</span>
+                    <span class="detail-value red">$${s.stop}</span>
+                </div>
+            </div>
+        `).join('');
+        
+        const sellContainer = document.getElementById('sellSignals');
+        sellContainer.innerHTML = sellData.map(s => `
+            <div class="signal sell">
+                <div class="signal-header">
+                    <div class="symbol">${s.symbol}</div>
+                    <div class="signal-badge sell">SELL</div>
+                </div>
+                <div class="detail">
+                    <span class="detail-label">Prezzo</span>
+                    <span class="price">$${s.price}</span>
+                </div>
+                <div class="detail">
+                    <span class="detail-label">Motivo</span>
+                    <span class="detail-value">${s.reason}</span>
+                </div>
+            </div>
+        `).join('');
+    }
+    
+    function toggleAuto() {
+        autoScan = !autoScan;
+        if (autoScan) {
+            document.getElementById('autoStatus').textContent = 'Attivo (ogni 60min)';
+            toast('🔄 Scan automatico attivato');
+            scanNow();
+            autoTimer = setInterval(scanNow, 60 * 60 * 1000);
+        } else {
+            document.getElementById('autoStatus').textContent = 'Disattivato';
+            toast('⏸️ Scan automatico disattivato');
+            if (autoTimer) clearInterval(autoTimer);
+        }
+    }
+    
+    function showInfo() {
+        alert('🐢 Turtle Trading\n\nMetodo di trend-following basato su breakout di prezzo.\n\nSistema 1: 20/10 giorni\nSistema 2: 55/20 giorni\n\nRischio: 2% per trade\nStop Loss: 2 ATR');
+    }
+    
+    function toast(msg) {
+        const t = document.getElementById('toast');
+        document.getElementById('toastMsg').textContent = msg;
+        t.classList.add('show');
+        setTimeout(() => t.classList.remove('show'), 3000);
+    }
+    
+    // Auto-genera dati demo all'avvio
+    window.addEventListener('load', () => {
+        generateSignals();
+        updateUI();
+    });
+</script>
+```
 
-Fai così (direttamente da iPad):
-
-### **Passo 1: Crea Repository**
-
-1. Apri Safari → [github.com](http://github.com)
-1. Crea nuovo repository “turtle-trading”
-1. ✅ Spunta “Add README”
-
-### **Passo 2: Aggiungi File Uno per Uno**
-
-Per ogni file:
-
-1. Nel repository → **“Add file”** → **“Create new file”**
-1. Nome: `turtle_webapp.html`
-1. Torna qui su Claude
-1. **Tap “Copia”** sul file turtle_webapp.html
-1. Torna su GitHub
-1. **Incolla** nel box del codice
-1. Scorri in basso → **“Commit new file”**
-
-Ripeti per:
-
-- `app.js`
-- `manifest.json`
-- `service-worker.js`
-
------
-
-## 🚀 **OPZIONE 3: File UNICO (Ti preparo ora!)**
-
-Ti creo **UN SOLO FILE** che contiene tutto in uno - più facile da gestire!​​​​​​​​​​​​​​​​
-
-Perfetto! 🎉 Ti ho creato **UN SOLO FILE** molto più facile da gestire!
-
-## 📄 **turtle_trading_standalone.html**
-
-Questo file contiene **TUTTO in uno**:
-
-- ✅ HTML
-- ✅ CSS
-- ✅ JavaScript
-- ✅ Configurazioni
-
------
-
-## 🚀 **Caricamento SUPER FACILE su GitHub:**
-
-### **Da iPad/iPhone:**
-
-1. **Tap su “Condividi”** sul file `turtle_trading_standalone.html`
-1. **Salva su “File”** (iCloud Drive)
-1. Apri **Safari** → vai su **github.com**
-1. Crea repository “turtle-trading”
-1. **“Add file”** → **“Upload files”**
-1. **Tap “Scegli file”** → Seleziona da iCloud
-1. **“Commit changes”**
-1. **Settings** → **Pages** → Attiva
-1. URL: `https://[username].github.io/turtle-trading/turtle_trading_standalone.html`
-
-### **Oppure Copia-Incolla:**
-
-1. **Tap “Copia”** sul file qui sopra ↑
-1. Vai su **github.com** (Safari)
-1. Nuovo repository “turtle-trading”
-1. **“Add file”** → **“Create new file”**
-1. Nome: `index.html`
-1. **Incolla** tutto il codice
-1. **“Commit new file”**
-1. **Settings** → **Pages** → Attiva
-1. URL: `https://[username].github.io/turtle-trading/`
-
------
-
-## 📱 **Installazione su iPad:**
-
-1. Apri **Safari**
-1. Vai all’URL GitHub Pages
-1. **Condividi** → **“Aggiungi a Home”**
-1. ✅ **APP INSTALLATA!**
-
------
-
-## ✨ **Vantaggi File Standalone:**
-
-- ✅ **1 solo file** invece di 4
-- ✅ Più facile da gestire
-- ✅ Funziona subito aprendo il file
-- ✅ Nessuna dipendenza esterna
-- ✅ Tutto auto-contenuto
-
------
-
-**Quale metodo preferisci? Dimmi se hai bisogno di aiuto con qualche passaggio!** 🐢​​​​​​​​​​​​​​​​
+</body>
+</html>
