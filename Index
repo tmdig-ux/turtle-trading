@@ -1,70 +1,931 @@
 <!DOCTYPE html>
-<html>
+
+<html lang="it">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Turtle Trading</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Turtle Trading">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'><rect fill='%230a0e14' width='200' height='200'/><circle cx='100' cy='100' r='60' fill='%2300ff88'/><text x='100' y='130' font-size='80' text-anchor='middle'>🐢</text></svg>">
+    <title>🐢 Turtle Trading Scanner</title>
+
+```
 <style>
-body{background:#000;color:#0f0;font-family:Arial;padding:20px}
-h1{font-size:40px;text-align:center}
-.card{background:#111;border:2px solid #0f0;padding:20px;margin:20px 0;border-radius:10px}
-button{background:#0f0;color:#000;border:none;padding:20px;font-size:18px;width:100%;margin:10px 0;border-radius:10px;font-weight:bold}
-.signal{background:#222;border-left:4px solid #0f0;padding:15px;margin:10px 0}
-.symbol{font-size:24px;font-weight:bold}
+    @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=DM+Serif+Display:ital@0;1&display=swap');
+    
+    :root {
+        --bg-primary: #0a0e14;
+        --bg-secondary: #141920;
+        --bg-card: #1a1f28;
+        --accent-green: #00ff88;
+        --accent-red: #ff3366;
+        --accent-blue: #00b4ff;
+        --accent-yellow: #ffd700;
+        --text-primary: #e6edf3;
+        --text-secondary: #8b949e;
+        --border-color: #30363d;
+        --shadow: 0 8px 32px rgba(0, 255, 136, 0.12);
+    }
+    
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        -webkit-tap-highlight-color: transparent;
+    }
+    
+    body {
+        font-family: 'JetBrains Mono', monospace;
+        background: var(--bg-primary);
+        color: var(--text-primary);
+        overflow-x: hidden;
+        position: relative;
+        min-height: 100vh;
+    }
+    
+    body::before {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: 
+            radial-gradient(circle at 20% 50%, rgba(0, 255, 136, 0.05) 0%, transparent 50%),
+            radial-gradient(circle at 80% 80%, rgba(0, 180, 255, 0.05) 0%, transparent 50%),
+            radial-gradient(circle at 40% 10%, rgba(255, 215, 0, 0.03) 0%, transparent 50%);
+        pointer-events: none;
+        z-index: 0;
+    }
+    
+    .container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 20px;
+        position: relative;
+        z-index: 1;
+    }
+    
+    header {
+        text-align: center;
+        padding: 40px 0 60px;
+        position: relative;
+    }
+    
+    .logo {
+        font-family: 'DM Serif Display', serif;
+        font-size: clamp(2.5rem, 5vw, 4rem);
+        font-weight: 400;
+        background: linear-gradient(135deg, var(--accent-green) 0%, var(--accent-blue) 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 10px;
+        letter-spacing: -0.02em;
+        animation: fadeInDown 0.8s ease-out;
+    }
+    
+    .turtle-icon {
+        font-size: 3rem;
+        animation: float 3s ease-in-out infinite;
+    }
+    
+    @keyframes float {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-10px); }
+    }
+    
+    .tagline {
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        animation: fadeIn 1s ease-out 0.3s both;
+    }
+    
+    @keyframes fadeInDown {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+    
+    .status-bar {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        margin-bottom: 40px;
+        animation: fadeIn 1s ease-out 0.5s both;
+    }
+    
+    .status-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 20px;
+        position: relative;
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+    
+    .status-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 2px;
+        background: linear-gradient(90deg, transparent, var(--accent-green), transparent);
+        animation: shimmer 2s infinite;
+    }
+    
+    @keyframes shimmer {
+        0% { transform: translateX(-100%); }
+        100% { transform: translateX(100%); }
+    }
+    
+    .status-card:active {
+        transform: scale(0.98);
+    }
+    
+    .status-label {
+        font-size: 0.75rem;
+        color: var(--text-secondary);
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        margin-bottom: 8px;
+    }
+    
+    .status-value {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--text-primary);
+    }
+    
+    .status-value.green { color: var(--accent-green); }
+    .status-value.red { color: var(--accent-red); }
+    .status-value.blue { color: var(--accent-blue); }
+    
+    .control-panel {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 20px;
+        margin-bottom: 40px;
+        animation: fadeIn 1s ease-out 0.7s both;
+    }
+    
+    .control-btn {
+        background: var(--bg-card);
+        border: 2px solid var(--border-color);
+        border-radius: 16px;
+        padding: 30px;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+        font-family: inherit;
+        color: var(--text-primary);
+        text-align: left;
+        min-height: 140px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+    
+    .control-btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: radial-gradient(circle at center, rgba(0, 255, 136, 0.1) 0%, transparent 70%);
+        opacity: 0;
+        transition: opacity 0.3s;
+    }
+    
+    .control-btn:hover::before {
+        opacity: 1;
+    }
+    
+    .control-btn:active {
+        transform: scale(0.96);
+        border-color: var(--accent-green);
+    }
+    
+    .btn-icon {
+        font-size: 2.5rem;
+        margin-bottom: 15px;
+        display: block;
+    }
+    
+    .btn-label {
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-bottom: 5px;
+    }
+    
+    .btn-description {
+        font-size: 0.8rem;
+        color: var(--text-secondary);
+        line-height: 1.4;
+    }
+    
+    .results-section {
+        margin-top: 40px;
+        animation: fadeIn 1s ease-out 0.9s both;
+    }
+    
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 25px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid var(--border-color);
+    }
+    
+    .section-title {
+        font-family: 'DM Serif Display', serif;
+        font-size: 1.8rem;
+        font-style: italic;
+    }
+    
+    .signal-count {
+        background: var(--accent-green);
+        color: var(--bg-primary);
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 700;
+    }
+    
+    .signals-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+        gap: 20px;
+        margin-bottom: 40px;
+    }
+    
+    .signal-card {
+        background: var(--bg-card);
+        border: 2px solid var(--border-color);
+        border-radius: 16px;
+        padding: 25px;
+        position: relative;
+        overflow: hidden;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .signal-card:hover {
+        border-color: var(--accent-green);
+        box-shadow: var(--shadow);
+        transform: translateY(-4px);
+    }
+    
+    .signal-card.buy {
+        border-left: 4px solid var(--accent-green);
+    }
+    
+    .signal-card.sell {
+        border-left: 4px solid var(--accent-red);
+    }
+    
+    .signal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 20px;
+    }
+    
+    .symbol {
+        font-size: 1.5rem;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+    }
+    
+    .signal-badge {
+        padding: 6px 12px;
+        border-radius: 8px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+    
+    .badge-buy {
+        background: rgba(0, 255, 136, 0.15);
+        color: var(--accent-green);
+    }
+    
+    .badge-sell {
+        background: rgba(255, 51, 102, 0.15);
+        color: var(--accent-red);
+    }
+    
+    .signal-details {
+        display: grid;
+        gap: 12px;
+    }
+    
+    .detail-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    
+    .detail-row:last-child {
+        border-bottom: none;
+    }
+    
+    .detail-label {
+        font-size: 0.8rem;
+        color: var(--text-secondary);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+    
+    .detail-value {
+        font-size: 0.95rem;
+        font-weight: 600;
+    }
+    
+    .price {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: var(--accent-blue);
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 80px 20px;
+        color: var(--text-secondary);
+    }
+    
+    .empty-icon {
+        font-size: 4rem;
+        margin-bottom: 20px;
+        opacity: 0.3;
+    }
+    
+    .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.85);
+        backdrop-filter: blur(10px);
+        z-index: 1000;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        animation: fadeIn 0.3s;
+    }
+    
+    .modal.active {
+        display: flex;
+    }
+    
+    .modal-content {
+        background: var(--bg-secondary);
+        border: 2px solid var(--border-color);
+        border-radius: 20px;
+        padding: 40px;
+        max-width: 600px;
+        width: 100%;
+        max-height: 90vh;
+        overflow-y: auto;
+        animation: slideUp 0.3s ease-out;
+        position: relative;
+    }
+    
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .modal-header {
+        font-family: 'DM Serif Display', serif;
+        font-size: 2rem;
+        margin-bottom: 25px;
+        font-style: italic;
+    }
+    
+    .modal-close {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        background: none;
+        border: none;
+        color: var(--text-secondary);
+        font-size: 2rem;
+        cursor: pointer;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        transition: all 0.2s;
+    }
+    
+    .modal-close:hover {
+        background: var(--bg-card);
+        color: var(--text-primary);
+    }
+    
+    .form-group {
+        margin-bottom: 25px;
+    }
+    
+    .form-label {
+        display: block;
+        font-size: 0.85rem;
+        color: var(--text-secondary);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: 10px;
+    }
+    
+    .form-input {
+        width: 100%;
+        background: var(--bg-card);
+        border: 2px solid var(--border-color);
+        border-radius: 10px;
+        padding: 15px;
+        color: var(--text-primary);
+        font-family: inherit;
+        font-size: 1rem;
+        transition: all 0.2s;
+    }
+    
+    .form-input:focus {
+        outline: none;
+        border-color: var(--accent-green);
+        background: var(--bg-primary);
+    }
+    
+    .btn-primary {
+        width: 100%;
+        background: var(--accent-green);
+        color: var(--bg-primary);
+        border: none;
+        border-radius: 12px;
+        padding: 18px;
+        font-family: inherit;
+        font-size: 1rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.2s;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+    
+    .btn-primary:active {
+        transform: scale(0.98);
+    }
+    
+    .toast {
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        background: var(--bg-card);
+        border: 2px solid var(--accent-green);
+        border-radius: 12px;
+        padding: 20px 25px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+        transform: translateX(400px);
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        z-index: 2000;
+        max-width: 350px;
+    }
+    
+    .toast.show {
+        transform: translateX(0);
+    }
+    
+    .toast-content {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+    
+    .toast-icon {
+        font-size: 1.5rem;
+    }
+    
+    .toast-message {
+        font-size: 0.9rem;
+        line-height: 1.4;
+    }
+    
+    @media (max-width: 768px) {
+        .container {
+            padding: 15px;
+        }
+        
+        header {
+            padding: 30px 0 40px;
+        }
+        
+        .logo {
+            font-size: 2.5rem;
+        }
+        
+        .control-panel {
+            grid-template-columns: 1fr;
+        }
+        
+        .signals-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .modal-content {
+            padding: 30px 20px;
+        }
+    }
 </style>
+```
+
 </head>
 <body>
+    <div class="container">
+        <header>
+            <div class="turtle-icon">🐢</div>
+            <h1 class="logo">Turtle Trading</h1>
+            <p class="tagline">Trend Following Scanner</p>
+        </header>
 
-<h1>🐢 TURTLE TRADING</h1>
-
-<div class="card">
-<div>ULTIMO SCAN: <span id="time">--:--</span></div>
-<div>SEGNALI BUY: <span id="buy">0</span></div>
-<div>SEGNALI SELL: <span id="sell">0</span></div>
+```
+    <div class="status-bar">
+        <div class="status-card">
+            <div class="status-label">Ultimo Scan</div>
+            <div class="status-value" id="lastScan">--:--</div>
+        </div>
+        <div class="status-card">
+            <div class="status-label">Segnali Buy</div>
+            <div class="status-value green" id="buyCount">0</div>
+        </div>
+        <div class="status-card">
+            <div class="status-label">Segnali Sell</div>
+            <div class="status-value red" id="sellCount">0</div>
+        </div>
+        <div class="status-card">
+            <div class="status-label">Posizioni Aperte</div>
+            <div class="status-value blue" id="positionsCount">0</div>
+        </div>
+    </div>
+    
+    <div class="control-panel">
+        <button class="control-btn" onclick="runScan()">
+            <span class="btn-icon">🔍</span>
+            <div>
+                <div class="btn-label">Scansiona Ora</div>
+                <div class="btn-description">Cerca nuove opportunità</div>
+            </div>
+        </button>
+        
+        <button class="control-btn" onclick="toggleAutoScan()">
+            <span class="btn-icon">🔄</span>
+            <div>
+                <div class="btn-label">Scan Automatico</div>
+                <div class="btn-description" id="autoScanStatus">Disattivato</div>
+            </div>
+        </button>
+        
+        <button class="control-btn" onclick="showPortfolio()">
+            <span class="btn-icon">📊</span>
+            <div>
+                <div class="btn-label">Portafoglio</div>
+                <div class="btn-description">Gestisci posizioni</div>
+            </div>
+        </button>
+        
+        <button class="control-btn" onclick="showSettings()">
+            <span class="btn-icon">⚙️</span>
+            <div>
+                <div class="btn-label">Configurazione</div>
+                <div class="btn-description">Sistema e parametri</div>
+            </div>
+        </button>
+    </div>
+    
+    <div class="results-section">
+        <div class="section-header">
+            <h2 class="section-title">Opportunità di Acquisto</h2>
+            <span class="signal-count" id="buyCountBadge">0 segnali</span>
+        </div>
+        <div class="signals-grid" id="buySignals">
+            <div class="empty-state">
+                <div class="empty-icon">📈</div>
+                <p>Nessun segnale - Esegui una scansione</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="results-section">
+        <div class="section-header">
+            <h2 class="section-title">Segnali di Vendita</h2>
+            <span class="signal-count" style="background: var(--accent-red);" id="sellCountBadge">0 segnali</span>
+        </div>
+        <div class="signals-grid" id="sellSignals">
+            <div class="empty-state">
+                <div class="empty-icon">📉</div>
+                <p>Nessun segnale di vendita</p>
+            </div>
+        </div>
+    </div>
 </div>
 
-<button onclick="scan()">🔍 SCANSIONA ORA</button>
-<button onclick="auto()">🔄 SCAN AUTOMATICO</button>
+<div class="modal" id="settingsModal">
+    <div class="modal-content">
+        <button class="modal-close" onclick="closeModal('settingsModal')">×</button>
+        <h2 class="modal-header">Configurazione</h2>
+        
+        <div class="form-group">
+            <label class="form-label">Sistema</label>
+            <select class="form-input" id="tradingSystem">
+                <option value="20-10">Sistema 1: Veloce (20/10 giorni)</option>
+                <option value="55-20">Sistema 2: Lento (55/20 giorni)</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label class="form-label">Capitale ($)</label>
+            <input type="number" class="form-input" id="capital" value="100000" min="1000" step="1000">
+        </div>
+        
+        <div class="form-group">
+            <label class="form-label">Rischio %</label>
+            <input type="number" class="form-input" id="riskPercent" value="2" min="0.5" max="5" step="0.5">
+        </div>
+        
+        <button class="btn-primary" onclick="saveSettings()">Salva</button>
+    </div>
+</div>
 
-<h2>📈 SEGNALI BUY</h2>
-<div id="buys"></div>
+<div class="modal" id="portfolioModal">
+    <div class="modal-content">
+        <button class="modal-close" onclick="closeModal('portfolioModal')">×</button>
+        <h2 class="modal-header">Portafoglio</h2>
+        <div id="portfolioContent"></div>
+    </div>
+</div>
 
-<h2>📉 SEGNALI SELL</h2>
-<div id="sells"></div>
+<div class="toast" id="toast">
+    <div class="toast-content">
+        <span class="toast-icon">✅</span>
+        <div class="toast-message" id="toastMessage"></div>
+    </div>
+</div>
 
 <script>
-let data=[];
-function scan(){
-  data=[
-    {s:'AAPL',p:178.50,b:175.20,a:580},
-    {s:'MSFT',p:425.80,b:418.30,a:120},
-    {s:'GOOGL',p:142.30,b:138.90,a:350},
-    {s:'NVDA',p:505.20,b:495.10,a:100}
-  ];
-  show();
-  document.getElementById('time').innerText=new Date().toLocaleTimeString();
-  alert('✅ Scansione completata!');
-}
-function show(){
-  let html='';
-  data.forEach(d=>{
-    html+=`<div class="signal">
-      <div class="symbol">${d.s}</div>
-      <div>Prezzo: $${d.p}</div>
-      <div>Breakout: $${d.b}</div>
-      <div>Posizione: ${d.a} azioni</div>
-    </div>`;
-  });
-  document.getElementById('buys').innerHTML=html;
-  document.getElementById('buy').innerText=data.length;
-  document.getElementById('sells').innerHTML='<div class="signal">JPM - $142.30 - Stop Loss</div>';
-  document.getElementById('sell').innerText='1';
-}
-function auto(){
-  alert('Scan automatico attivato! Scannerà ogni ora.');
-  scan();
-}
+    // App Logic
+    let config = {
+        tradingSystem: '20-10',
+        capital: 100000,
+        riskPercent: 2,
+        autoScan: false
+    };
+    
+    let buySignals = [];
+    let sellSignals = [];
+    let portfolio = [];
+    let autoScanTimer = null;
+    
+    const STOCKS = ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'NVDA', 'META', 'TSLA', 'JPM', 'V', 'WMT'];
+    
+    window.addEventListener('load', () => {
+        loadConfig();
+        loadPortfolio();
+        generateDemoData();
+        updateUI();
+    });
+    
+    function loadConfig() {
+        const saved = localStorage.getItem('turtleConfig');
+        if (saved) config = JSON.parse(saved);
+    }
+    
+    function saveSettings() {
+        config.tradingSystem = document.getElementById('tradingSystem').value;
+        config.capital = parseFloat(document.getElementById('capital').value);
+        config.riskPercent = parseFloat(document.getElementById('riskPercent').value);
+        localStorage.setItem('turtleConfig', JSON.stringify(config));
+        closeModal('settingsModal');
+        showToast('Configurazione salvata! ✅');
+    }
+    
+    function loadPortfolio() {
+        const saved = localStorage.getItem('turtlePortfolio');
+        if (saved) portfolio = JSON.parse(saved);
+    }
+    
+    async function runScan() {
+        showToast('Scansione in corso... 🔍');
+        await new Promise(r => setTimeout(r, 1000));
+        generateDemoData();
+        updateUI();
+        document.getElementById('lastScan').textContent = new Date().toLocaleTimeString('it-IT', {hour: '2-digit', minute: '2-digit'});
+        showToast('Scansione completata! ✅');
+    }
+    
+    function toggleAutoScan() {
+        config.autoScan = !config.autoScan;
+        if (config.autoScan) {
+            document.getElementById('autoScanStatus').textContent = 'Attivo (ogni 60min)';
+            showToast('Scan automatico attivato 🔄');
+            runScan();
+            autoScanTimer = setInterval(runScan, 60 * 60 * 1000);
+        } else {
+            document.getElementById('autoScanStatus').textContent = 'Disattivato';
+            showToast('Scan automatico disattivato');
+            if (autoScanTimer) clearInterval(autoScanTimer);
+        }
+    }
+    
+    function updateUI() {
+        document.getElementById('buyCount').textContent = buySignals.length;
+        document.getElementById('sellCount').textContent = sellSignals.length;
+        document.getElementById('positionsCount').textContent = portfolio.length;
+        document.getElementById('buyCountBadge').textContent = `${buySignals.length} segnali`;
+        document.getElementById('sellCountBadge').textContent = `${sellSignals.length} segnali`;
+        renderBuySignals();
+        renderSellSignals();
+    }
+    
+    function renderBuySignals() {
+        const container = document.getElementById('buySignals');
+        if (buySignals.length === 0) {
+            container.innerHTML = '<div class="empty-state"><div class="empty-icon">📈</div><p>Esegui una scansione</p></div>';
+            return;
+        }
+        container.innerHTML = buySignals.map(s => `
+            <div class="signal-card buy">
+                <div class="signal-header">
+                    <div class="symbol">${s.symbol}</div>
+                    <div class="signal-badge badge-buy">BUY</div>
+                </div>
+                <div class="signal-details">
+                    <div class="detail-row">
+                        <span class="detail-label">Prezzo</span>
+                        <span class="price">$${s.price.toFixed(2)}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Breakout</span>
+                        <span class="detail-value">$${s.breakoutLevel.toFixed(2)}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Forza</span>
+                        <span class="detail-value" style="color: var(--accent-green);">+${s.strength.toFixed(2)}%</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Posizione</span>
+                        <span class="detail-value">${s.positionSize} azioni</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Valore</span>
+                        <span class="detail-value">$${s.positionValue.toLocaleString()}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Stop Loss</span>
+                        <span class="detail-value" style="color: var(--accent-red);">$${(s.price - 2 * s.atr).toFixed(2)}</span>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    }
+    
+    function renderSellSignals() {
+        const container = document.getElementById('sellSignals');
+        if (sellSignals.length === 0) {
+            container.innerHTML = '<div class="empty-state"><div class="empty-icon">📉</div><p>Nessun segnale</p></div>';
+            return;
+        }
+        container.innerHTML = sellSignals.map(s => `
+            <div class="signal-card sell">
+                <div class="signal-header">
+                    <div class="symbol">${s.symbol}</div>
+                    <div class="signal-badge badge-sell">SELL</div>
+                </div>
+                <div class="signal-details">
+                    <div class="detail-row">
+                        <span class="detail-label">Prezzo</span>
+                        <span class="price">$${s.price.toFixed(2)}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Motivo</span>
+                        <span class="detail-value">${s.reason}</span>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    }
+    
+    function showSettings() {
+        document.getElementById('tradingSystem').value = config.tradingSystem;
+        document.getElementById('capital').value = config.capital;
+        document.getElementById('riskPercent').value = config.riskPercent;
+        document.getElementById('settingsModal').classList.add('active');
+    }
+    
+    function showPortfolio() {
+        const container = document.getElementById('portfolioContent');
+        if (portfolio.length === 0) {
+            container.innerHTML = '<div class="empty-state"><div class="empty-icon">💼</div><p>Nessuna posizione</p></div>';
+        } else {
+            container.innerHTML = portfolio.map(p => `
+                <div class="signal-card" style="margin-bottom: 15px;">
+                    <div class="signal-header">
+                        <div class="symbol">${p.symbol}</div>
+                        <div style="font-size: 0.9rem;">${p.shares} azioni</div>
+                    </div>
+                    <div class="signal-details">
+                        <div class="detail-row">
+                            <span class="detail-label">Entrata</span>
+                            <span class="detail-value">$${p.entryPrice.toFixed(2)}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Stop Loss</span>
+                            <span class="detail-value" style="color: var(--accent-red);">$${p.stopLoss.toFixed(2)}</span>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+        document.getElementById('portfolioModal').classList.add('active');
+    }
+    
+    function closeModal(id) {
+        document.getElementById(id).classList.remove('active');
+    }
+    
+    function showToast(msg) {
+        const toast = document.getElementById('toast');
+        document.getElementById('toastMessage').textContent = msg;
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+    
+    function generateDemoData() {
+        buySignals = STOCKS.slice(0, 5).map(symbol => {
+            const price = 50 + Math.random() * 200;
+            const atr = price * (0.02 + Math.random() * 0.03);
+            const breakoutLevel = price * (0.95 + Math.random() * 0.03);
+            const positionSize = Math.floor((config.capital * (config.riskPercent / 100)) / (2 * atr));
+            return {
+                symbol,
+                price,
+                breakoutLevel,
+                strength: ((price - breakoutLevel) / breakoutLevel) * 100,
+                atr,
+                positionSize,
+                positionValue: positionSize * price
+            };
+        });
+        
+        sellSignals = ['JPM', 'WMT'].map(symbol => ({
+            symbol,
+            price: 50 + Math.random() * 150,
+            reason: Math.random() > 0.5 ? 'Breakout Exit' : 'Stop Loss'
+        }));
+        
+        if (portfolio.length === 0) {
+            portfolio = [
+                { symbol: 'AAPL', entryPrice: 175.50, shares: 285, stopLoss: 168.60 },
+                { symbol: 'MSFT', entryPrice: 420.00, shares: 119, stopLoss: 413.20 }
+            ];
+            localStorage.setItem('turtlePortfolio', JSON.stringify(portfolio));
+        }
+    }
+    
+    window.addEventListener('click', (e) => {
+        if (e.target.classList.contains('modal')) {
+            e.target.classList.remove('active');
+        }
+    });
 </script>
+```
 
 </body>
 </html>
